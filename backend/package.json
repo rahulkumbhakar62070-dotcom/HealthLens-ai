@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node tests/upload.test.js"
+    "test": "node tests/upload.test.js",
+    "test:benchmark": "node tests/benchmark.test.js",
+    "adaption:generate": "node scripts/generate_adaption_dataset.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

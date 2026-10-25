@@ -1,0 +1,148 @@
+{
+  "_provenance": {
+    "source": "Adaption Labs Benchmark Scaffolding (Synthetic Fallback Dataset)",
+    "purpose": "Evaluates parser extraction, reference range comparison, missing-field handling, and qualitative values",
+    "disclaimer": "SYNTHETIC TEST DATA ONLY. Not real medical reports, not clinical evidence, and not verified medical facts. Used strictly for automated software testing.",
+    "is_synthetic": true,
+    "version": "1.0.0",
+    "generated_at": "2026-10-25T12:30:00.000Z",
+    "total_cases": 13
+  },
+  "cases": [
+    {
+      "id": "syn-01",
+      "test_name": "Hemoglobin",
+      "observed_value": 14.2,
+      "unit": "g/dL",
+      "reference_range": "12.0 - 15.5",
+      "expected_status": "Within Range",
+      "category": "standard_numeric_normal",
+      "notes": "Standard interval, observed value cleanly centered within range."
+    },
+    {
+      "id": "syn-02",
+      "test_name": "Fasting Blood Glucose",
+      "observed_value": 126.0,
+      "unit": "mg/dL",
+      "reference_range": "70 - 99",
+      "expected_status": "Above Range",
+      "category": "standard_numeric_high",
+      "notes": "Elevated test value above the printed upper boundary (99)."
+    },
+    {
+      "id": "syn-03",
+      "test_name": "Serum Potassium",
+      "observed_value": 3.1,
+      "unit": "mEq/L",
+      "reference_range": "3.5 - 5.0",
+      "expected_status": "Below Range",
+      "category": "standard_numeric_low",
+      "notes": "Depressed test value below the printed lower boundary (3.5)."
+    },
+    {
+      "id": "syn-04",
+      "test_name": "Total Cholesterol",
+      "observed_value": 185.0,
+      "unit": "mg/dL",
+      "reference_range": "< 200",
+      "expected_status": "Within Range",
+      "category": "inequality_less_than",
+      "notes": "Single upper bound inequality; value (185) satisfies < 200."
+    },
+    {
+      "id": "syn-05",
+      "test_name": "HDL Cholesterol",
+      "observed_value": 35.0,
+      "unit": "mg/dL",
+      "reference_range": "> 40",
+      "expected_status": "Below Range",
+      "category": "inequality_greater_than_low",
+      "notes": "Single lower bound inequality; value (35) fails to meet > 40."
+    },
+    {
+      "id": "syn-06",
+      "test_name": "C-Reactive Protein (CRP)",
+      "observed_value": 12.4,
+      "unit": "mg/L",
+      "reference_range": "< 3.0",
+      "expected_status": "Above Range",
+      "category": "inequality_less_than_high",
+      "notes": "Value (12.4) exceeds single upper bound (< 3.0)."
+    },
+    {
+      "id": "syn-07",
+      "test_name": "Blood Culture",
+      "observed_value": "No growth after 48 hrs",
+      "unit": "",
+      "reference_range": "Negative",
+      "expected_status": "Not Evaluated",
+      "expected_reason": "Observed value is qualitative or non-numeric",
+      "category": "qualitative_non_numeric",
+      "notes": "Qualitative finding. Must not be evaluated mathematically."
+    },
+    {
+      "id": "syn-08",
+      "test_name": "Experimental Biomarker X",
+      "observed_value": 42.0,
+      "unit": "ng/mL",
+      "reference_range": null,
+      "expected_status": "Not Evaluated",
+      "expected_reason": "No reference range provided in report",
+      "category": "missing_reference_range",
+      "notes": "Missing reference range in report. System must mark as Not Evaluated."
+    },
+    {
+      "id": "syn-09",
+      "test_name": "Thyroid Stimulating Hormone (TSH)",
+      "observed_value": 5.8,
+      "unit": "uIU/mL",
+      "reference_range": "0.4 - 4.5",
+      "expected_status": "Above Range",
+      "category": "standard_numeric_high",
+      "notes": "Elevated TSH above upper limit (4.5)."
+    },
+    {
+      "id": "syn-10",
+      "test_name": "Platelet Count",
+      "observed_value": 95.0,
+      "unit": "10^3/uL",
+      "reference_range": "150 - 450",
+      "expected_status": "Below Range",
+      "category": "standard_numeric_low",
+      "notes": "Low platelet count below lower boundary (150)."
+    },
+    {
+      "id": "syn-11",
+      "test_name": "Urinary Protein",
+      "observed_value": "Trace",
+      "unit": "",
+      "reference_range": "Negative",
+      "expected_status": "Not Evaluated",
+      "expected_reason": "Observed value is qualitative or non-numeric",
+      "category": "qualitative_non_numeric",
+      "notes": "Urinalysis qualitative marker; non-numeric observed value."
+    },
+    {
+      "id": "syn-12",
+      "test_name": "Inconclusive Marker Y",
+      "observed_value": null,
+      "unit": "mg/dL",
+      "reference_range": "10 - 20",
+      "expected_status": "Not Evaluated",
+      "expected_reason": "Observed test value is missing or unparseable",
+      "category": "missing_observed_value",
+      "notes": "Missing observed value. Must not invent or guess values."
+    },
+    {
+      "id": "syn-13",
+      "test_name": "Antinuclear Antibodies (ANA)",
+      "observed_value": 0.4,
+      "unit": "index",
+      "reference_range": "Negative",
+      "expected_status": "Not Evaluated",
+      "expected_reason": "Reference range is qualitative or non-numeric",
+      "category": "qualitative_reference_range",
+      "notes": "Observed value is numeric, but the reference interval stated on report is non-numeric/qualitative."
+    }
+  ]
+}
