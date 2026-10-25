@@ -2,3 +2,6 @@ node_modules/
 .env
 .env.local
 npm-debug.log*
+tmp/
+*.tmp
+tests/fixtures/large_report.pdf
