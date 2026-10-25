@@ -71,37 +71,26 @@ export default function ExtractedResults({ data, onReset }) {
 
   return (
     <div className="bg-surface rounded-2xl border border-border shadow-soft p-6 sm:p-8 space-y-6 animate-fadeIn">
-      {/* Top Banner: Success & Metadata */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-border gap-4">
-        <div className="flex items-start space-x-3.5">
-          <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center text-primary shrink-0 shadow-soft-sm">
-            <ShieldCheck className="w-6 h-6 text-primary" />
+      {/* Top Banner: Clinical Insights Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-border gap-4">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center text-primary shrink-0 shadow-soft-sm">
+            <ShieldCheck className="w-5 h-5 text-primary" />
           </div>
           <div>
             <div className="flex items-center space-x-2.5 flex-wrap">
-              <h2 className="text-xl sm:text-2xl font-heading font-bold text-charcoal">
-                Medical Report Evaluation & AI Insights
+              <h2 className="text-lg sm:text-xl font-heading font-bold text-charcoal">
+                Clinical Test Evaluations & Educational Insights
               </h2>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                {testCount} {testCount === 1 ? 'Marker' : 'Markers'} Processed
+                {testCount} {testCount === 1 ? 'Marker' : 'Markers'} Extracted
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-charcoal-muted mt-1">
-              Extracted from{' '}
-              <span className="font-semibold text-charcoal">{file?.name || 'Uploaded PDF'}</span> (
-              {formatFileSize(file?.size)})
+            <p className="text-xs text-charcoal-muted mt-0.5">
+              Deterministic mathematical comparison against report reference intervals
             </p>
           </div>
         </div>
-
-        <button
-          onClick={onReset}
-          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium text-charcoal-muted bg-background hover:bg-background/80 hover:text-charcoal border border-border transition-colors self-start sm:self-auto cursor-pointer"
-          title="Upload another document"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Upload Another PDF</span>
-        </button>
       </div>
 
       {/* Summary KPI Badges */}
@@ -503,12 +492,12 @@ export default function ExtractedResults({ data, onReset }) {
         </div>
       )}
 
-      {/* Phase 5 Status & Transparency Note */}
+      {/* Educational Guidance & Safety Policy */}
       <div className="pt-4 border-t border-border flex items-start space-x-2.5 text-xs text-charcoal-muted">
         <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
         <p>
-          <span className="font-semibold text-charcoal">Phase 5 AI Clinical Explanations:</span>{' '}
-          Explanations are strictly educational and generated from the actual extracted records and deterministic evaluation results. In accordance with clinical safety principles, out-of-range results are never treated as diagnoses, and no medications, dosages, or treatments are prescribed.
+          <span className="font-semibold text-charcoal">Educational Guidance & Safety Policy:</span>{' '}
+          Explanations are strictly educational and generated from actual extracted records and deterministic evaluation results. In accordance with clinical safety principles, out-of-range results are never treated as diagnoses, and no medications, dosages, or treatments are prescribed.
         </p>
       </div>
     </div>

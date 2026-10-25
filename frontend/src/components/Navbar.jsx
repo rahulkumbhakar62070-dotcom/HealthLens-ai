@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Activity, ShieldCheck, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Activity, RefreshCw } from 'lucide-react';
 
 export default function Navbar() {
   const [backendStatus, setBackendStatus] = useState({
@@ -42,38 +42,21 @@ export default function Navbar() {
               <Activity className="w-5 h-5 text-accent-soft" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-heading font-extrabold text-xl tracking-tight text-charcoal">
-                  HealthLens<span className="text-primary font-bold">.AI</span>
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent-soft text-primary">
-                  MVP
-                </span>
-              </div>
+              <span className="font-heading font-extrabold text-xl tracking-tight text-charcoal">
+                HealthLens<span className="text-primary font-bold">.AI</span>
+              </span>
               <p className="text-xs text-charcoal-muted hidden sm:block">
-                Medical Report Range Analyzer
+                Clinical Lab Report Analyzer
               </p>
             </div>
           </div>
 
-          {/* Center Info / Scope */}
-          <div className="hidden md:flex items-center space-x-6 text-sm text-charcoal-muted">
-            <div className="flex items-center space-x-1.5">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              <span>Educational Only</span>
-            </div>
-            <div className="text-border">•</div>
-            <span>Deterministic Math</span>
-            <div className="text-border">•</div>
-            <span>No Fabricated Data</span>
-          </div>
-
-          {/* Backend Health Status Badge */}
+          {/* Right: Compact System Operational Indicator */}
           <div className="flex items-center space-x-3">
             <button
               onClick={checkHealth}
-              title="Click to re-check backend connection"
-              className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer bg-white"
+              title="API connection active. Click to refresh status."
+              className="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium border border-border/80 bg-background/60 hover:bg-background transition-colors cursor-pointer"
             >
               {backendStatus.state === 'online' && (
                 <>
@@ -81,23 +64,22 @@ export default function Navbar() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  <span className="text-charcoal font-semibold">Backend Live</span>
-                  <span className="text-[10px] text-charcoal-muted">({backendStatus.data?.version || 'v1.0'})</span>
+                  <span className="text-charcoal font-medium">System Online</span>
                 </>
               )}
 
               {backendStatus.state === 'checking' && (
                 <>
                   <RefreshCw className="w-3 h-3 text-primary animate-spin" />
-                  <span className="text-charcoal-muted">Connecting...</span>
+                  <span className="text-charcoal-muted">Checking...</span>
                 </>
               )}
 
               {backendStatus.state === 'offline' && (
                 <>
                   <span className="h-2 w-2 rounded-full bg-rose-500"></span>
-                  <span className="text-rose-600 font-semibold">Backend Offline</span>
-                  <RefreshCw className="w-3 h-3 text-charcoal-muted ml-1" />
+                  <span className="text-rose-700 font-medium">System Offline</span>
+                  <RefreshCw className="w-3 h-3 text-rose-500 ml-0.5" />
                 </>
               )}
             </button>

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import ExtractedResults from './ExtractedResults.jsx';
 
-export default function UploadSection() {
+export default function UploadSection({ onAnalysisChange }) {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [validationError, setValidationError] = useState('');
@@ -107,6 +107,7 @@ export default function UploadSection() {
     setUploadResult(null);
     setUploadStep(0);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    onAnalysisChange?.(false);
   };
 
   const formatFileSize = (bytes) => {
@@ -150,6 +151,7 @@ export default function UploadSection() {
         warnings: data.warnings ?? [],
         rawTextLength: data.rawTextLength ?? 0,
       });
+      onAnalysisChange?.(true);
     } catch (err) {
       setUploadResult({
         success: false,
@@ -157,6 +159,7 @@ export default function UploadSection() {
           err.message ||
           'Failed to connect to the backend server. Please verify the server is running.',
       });
+      onAnalysisChange?.(false);
     } finally {
       setIsUploading(false);
     }
@@ -241,10 +244,9 @@ export default function UploadSection() {
                 </div>
               )}
 
-              <div className="flex items-center space-x-2 text-xs text-charcoal-muted bg-surface px-3 py-1.5 rounded-full border border-border">
-                <ShieldAlert className="w-3.5 h-3.5 text-primary" />
-                <span>Zero-retention: files processed ephemerally and unlinked immediately</span>
-              </div>
+              <p className="text-[11px] text-charcoal-muted/80">
+                Privacy-first • In-memory extraction • Zero server retention
+              </p>
             </div>
           </div>
 
@@ -331,11 +333,11 @@ export default function UploadSection() {
           <div className="mt-6 pt-5 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-charcoal-muted">
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span>Ephemeral Pipeline: Text extracted in memory, zero files retained on disk.</span>
+              <span>Privacy-First Architecture: Documents analyzed ephemerally in memory with zero disk retention.</span>
             </div>
-            <div className="font-medium text-primary flex items-center space-x-1.5">
-              <Database className="w-3.5 h-3.5" />
-              <span>Phase 6 Active: End-to-End Results Dashboard</span>
+            <div className="text-charcoal-muted flex items-center space-x-1.5">
+              <FileCheck className="w-3.5 h-3.5 text-primary" />
+              <span>Deterministic Range Comparison</span>
             </div>
           </div>
         </div>
