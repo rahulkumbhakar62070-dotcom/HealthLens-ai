@@ -12,6 +12,7 @@
     "test:evaluation": "node tests/evaluation.test.js",
     "test:gemini": "node tests/gemini.test.js",
     "test:flow": "node tests/dashboard_flow.test.js",
+    "test:layout": "node tests/layout_transition.test.js",
     "test:benchmark": "node tests/benchmark.test.js",
     "adaption:generate": "node scripts/generate_adaption_dataset.js",
     "adaption:verify": "node tests/verify_adaption_connection.js"
