@@ -9,7 +9,6 @@ import {
   Layers,
   ArrowUpRight,
   ArrowDownRight,
-  Minus,
   HelpCircle,
   ShieldCheck,
   AlertCircle,
@@ -57,32 +56,32 @@ export default function ExtractedResults({ data, onReset }) {
   const renderStatusBadge = (test) => {
     if (test.status === 'NORMAL') {
       return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+        <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
           <span>Within Range</span>
         </span>
       );
     }
     if (test.status === 'LOW') {
       return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200">
-          <ArrowDownRight className="w-3 h-3 text-sky-600" />
+        <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200">
+          <ArrowDownRight className="w-3.5 h-3.5 text-sky-600" />
           <span>Below Range</span>
         </span>
       );
     }
     if (test.status === 'HIGH') {
       return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
-          <ArrowUpRight className="w-3 h-3 text-rose-600" />
+        <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+          <ArrowUpRight className="w-3.5 h-3.5 text-rose-600" />
           <span>Above Range</span>
         </span>
       );
     }
     return (
       <div className="space-y-0.5">
-        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
-          <HelpCircle className="w-3 h-3 text-amber-600" />
+        <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-200">
+          <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
           <span>Not Evaluated</span>
         </span>
         {test.evaluationReason && (
@@ -146,10 +145,10 @@ export default function ExtractedResults({ data, onReset }) {
           <div>
             <div className="flex items-center space-x-2.5 flex-wrap">
               <h2 className="text-lg sm:text-xl font-heading font-bold text-charcoal">
-                Clinical Test Evaluations & Educational Insights
+                Laboratory Test Results
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                {testCount} {testCount === 1 ? 'Marker' : 'Markers'} Extracted
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent-soft text-primary border border-primary/20">
+                {testCount} {testCount === 1 ? 'Marker Extracted' : 'Markers Extracted'}
               </span>
             </div>
             <p className="text-xs text-charcoal-muted mt-0.5">
@@ -159,97 +158,122 @@ export default function ExtractedResults({ data, onReset }) {
         </div>
       </div>
 
-      {/* Summary KPI Badges */}
+      {/* Summary KPI Filter Badges */}
       {testCount > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3">
           <button
+            type="button"
             onClick={() => setStatusFilter('ALL')}
             className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
               statusFilter === 'ALL'
-                ? 'bg-primary/5 border-primary ring-1 ring-primary'
-                : 'bg-background/60 border-border hover:border-primary/50'
+                ? 'bg-primary/10 border-primary ring-1 ring-primary'
+                : 'bg-surface border-border hover:border-primary/40'
             }`}
           >
-            <p className="text-[11px] font-medium text-charcoal-muted uppercase">Total Markers</p>
-            <p className="text-xl font-heading font-bold text-charcoal mt-0.5">{testCount}</p>
+            <p className="text-[11px] font-semibold text-charcoal-muted uppercase tracking-wide">
+              Total Markers
+            </p>
+            <p className="text-xl sm:text-2xl font-heading font-bold text-charcoal mt-0.5">
+              {testCount}
+            </p>
           </button>
 
           <button
+            type="button"
             onClick={() => setStatusFilter('NORMAL')}
             className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
               statusFilter === 'NORMAL'
                 ? 'bg-emerald-50 border-emerald-500 ring-1 ring-emerald-500'
-                : 'bg-emerald-50/40 border-emerald-200/80 hover:border-emerald-400'
+                : 'bg-surface border-border hover:border-emerald-300'
             }`}
           >
             <div className="flex items-center justify-between">
-              <p className="text-[11px] font-medium text-emerald-800 uppercase">Within Range</p>
+              <p className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wide">
+                Within Range
+              </p>
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
             </div>
-            <p className="text-xl font-heading font-bold text-emerald-950 mt-0.5">{normalCount}</p>
+            <p className="text-xl sm:text-2xl font-heading font-bold text-emerald-950 mt-0.5">
+              {normalCount}
+            </p>
           </button>
 
           <button
+            type="button"
             onClick={() => setStatusFilter('LOW')}
             className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
               statusFilter === 'LOW'
                 ? 'bg-sky-50 border-sky-500 ring-1 ring-sky-500'
-                : 'bg-sky-50/40 border-sky-200/80 hover:border-sky-400'
+                : 'bg-surface border-border hover:border-sky-300'
             }`}
           >
             <div className="flex items-center justify-between">
-              <p className="text-[11px] font-medium text-sky-800 uppercase">Below Range</p>
+              <p className="text-[11px] font-semibold text-sky-800 uppercase tracking-wide">
+                Below Range
+              </p>
               <ArrowDownRight className="w-3.5 h-3.5 text-sky-600" />
             </div>
-            <p className="text-xl font-heading font-bold text-sky-950 mt-0.5">{lowCount}</p>
+            <p className="text-xl sm:text-2xl font-heading font-bold text-sky-950 mt-0.5">
+              {lowCount}
+            </p>
           </button>
 
           <button
+            type="button"
             onClick={() => setStatusFilter('HIGH')}
             className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
               statusFilter === 'HIGH'
                 ? 'bg-rose-50 border-rose-500 ring-1 ring-rose-500'
-                : 'bg-rose-50/40 border-rose-200/80 hover:border-rose-400'
+                : 'bg-surface border-border hover:border-rose-300'
             }`}
           >
             <div className="flex items-center justify-between">
-              <p className="text-[11px] font-medium text-rose-800 uppercase">Above Range</p>
+              <p className="text-[11px] font-semibold text-rose-800 uppercase tracking-wide">
+                Above Range
+              </p>
               <ArrowUpRight className="w-3.5 h-3.5 text-rose-600" />
             </div>
-            <p className="text-xl font-heading font-bold text-rose-950 mt-0.5">{highCount}</p>
+            <p className="text-xl sm:text-2xl font-heading font-bold text-rose-950 mt-0.5">
+              {highCount}
+            </p>
           </button>
 
           <button
+            type="button"
             onClick={() => setStatusFilter('NOT_EVALUATED')}
             className={`p-3 rounded-xl border text-left transition-all col-span-2 sm:col-span-1 cursor-pointer ${
               statusFilter === 'NOT_EVALUATED'
                 ? 'bg-amber-50 border-amber-500 ring-1 ring-amber-500'
-                : 'bg-amber-50/40 border-amber-200/80 hover:border-amber-400'
+                : 'bg-surface border-border hover:border-amber-300'
             }`}
           >
             <div className="flex items-center justify-between">
-              <p className="text-[11px] font-medium text-amber-800 uppercase">Not Evaluated</p>
+              <p className="text-[11px] font-semibold text-amber-900 uppercase tracking-wide">
+                Not Evaluated
+              </p>
               <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
             </div>
-            <p className="text-xl font-heading font-bold text-amber-950 mt-0.5">{notEvalCount}</p>
+            <p className="text-xl sm:text-2xl font-heading font-bold text-amber-950 mt-0.5">
+              {notEvalCount}
+            </p>
           </button>
         </div>
       )}
 
-      {/* Gemini AI Educational Synthesis Card (Phase 5) */}
+      {/* Gemini AI Educational Synthesis Card */}
       {aiExplanation && (
-        <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-accent-soft/20 via-background to-background p-5 sm:p-6 space-y-4 shadow-soft-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-border/80">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+        <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-accent-soft/20 via-surface to-surface p-5 sm:p-6 space-y-4 shadow-soft-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border">
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-primary shadow-soft-sm">
                 <Sparkles className="w-4 h-4 text-primary" />
               </div>
               <div>
                 <h3 className="font-heading font-bold text-sm sm:text-base text-charcoal">
                   AI Educational Synthesis
                 </h3>
-                <p className="text-[11px] text-charcoal-muted">
-                  Powered by Google Gemini 1.5 Flash • Patient-Friendly Medical Overview
+                <p className="text-xs text-charcoal-muted">
+                  Powered by Google Gemini · Patient-friendly medical overview
                 </p>
               </div>
             </div>
@@ -258,7 +282,7 @@ export default function ExtractedResults({ data, onReset }) {
               {aiExplanation.status === 'success' && (
                 <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Gemini AI Connected</span>
+                  <span>Gemini Connected</span>
                 </span>
               )}
 
@@ -279,7 +303,7 @@ export default function ExtractedResults({ data, onReset }) {
               {aiExplanation.status === 'error' && (
                 <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
                   <AlertCircle className="w-3 h-3 text-amber-600" />
-                  <span>Fallback Mode (Safe Rejection)</span>
+                  <span>Fallback Mode</span>
                 </span>
               )}
             </div>
@@ -292,9 +316,9 @@ export default function ExtractedResults({ data, onReset }) {
             </p>
           </div>
 
-          {/* Educational Safety Banner */}
-          <div className="flex items-start space-x-2 text-[11px] text-charcoal-muted bg-surface/80 p-3 rounded-lg border border-border">
-            <Stethoscope className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+          {/* Educational Safety Callout */}
+          <div className="flex items-start space-x-2.5 text-xs text-charcoal-muted bg-background/80 p-3 rounded-lg border border-border">
+            <Stethoscope className="w-4 h-4 text-primary shrink-0 mt-0.5" />
             <p>
               <span className="font-semibold text-charcoal">Medical Disclaimer:</span>{' '}
               {aiExplanation.disclaimer ||
@@ -306,14 +330,14 @@ export default function ExtractedResults({ data, onReset }) {
 
       {/* Flag Discrepancy Banner (if detected) */}
       {discrepancyCount > 0 && (
-        <div className="p-4 rounded-xl bg-amber-50/90 border border-amber-300 text-amber-900 flex items-start space-x-3 text-xs sm:text-sm">
+        <div className="p-4 rounded-xl bg-amber-50/90 border border-amber-300 text-amber-950 flex items-start space-x-3 text-xs sm:text-sm">
           <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <p className="font-semibold text-amber-900">
               Printed Flag Conflict Detected ({discrepancyCount}{' '}
               {discrepancyCount === 1 ? 'discrepancy' : 'discrepancies'})
             </p>
-            <p className="text-amber-800">
+            <p className="text-amber-900/90 leading-relaxed">
               One or more tests contain an explicit printed report flag (e.g., &quot;H&quot;) that conflicts with the deterministic mathematical comparison against the report&apos;s stated reference interval. Both the printed flag and calculated status are preserved without silent alteration.
             </p>
           </div>
@@ -354,7 +378,7 @@ export default function ExtractedResults({ data, onReset }) {
               <Search className="w-4 h-4 text-charcoal-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search test name (e.g. Glucose, Hemoglobin)..."
+                placeholder="Search test name (e.g., Glucose, Hemoglobin)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 rounded-xl bg-background border border-border text-xs sm:text-sm text-charcoal placeholder:text-charcoal-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
@@ -363,14 +387,15 @@ export default function ExtractedResults({ data, onReset }) {
 
             <div className="flex items-center space-x-3 self-end sm:self-center">
               <button
+                type="button"
                 onClick={() => setShowAllExplanations(!showAllExplanations)}
-                className="text-xs text-primary hover:text-primary-hover font-medium cursor-pointer"
+                className="text-xs text-primary hover:text-primary-hover font-semibold cursor-pointer transition-colors"
               >
-                {showAllExplanations ? 'Collapse AI Insights' : 'Expand All AI Insights'}
+                {showAllExplanations ? 'Collapse Educational Insights' : 'Expand All Educational Insights'}
               </button>
-              <div className="text-xs text-charcoal-muted">
+              <span className="text-xs text-charcoal-muted">
                 Showing {filteredTests.length} of {testCount} tests
-              </div>
+              </span>
             </div>
           </div>
 
@@ -379,10 +404,10 @@ export default function ExtractedResults({ data, onReset }) {
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="bg-background border-b border-border text-charcoal-muted uppercase text-[11px] tracking-wider font-semibold">
-                  <th className="py-3 px-4">Test / Analyte Name</th>
+                  <th className="py-3 px-4">Test / Marker Name</th>
                   <th className="py-3 px-4">Observed Value</th>
                   <th className="py-3 px-4">Unit</th>
-                  <th className="py-3 px-4">Report Reference Range</th>
+                  <th className="py-3 px-4">Reference Range</th>
                   <th className="py-3 px-4">Calculated Status</th>
                   <th className="py-3 px-4">Printed Flag</th>
                 </tr>
@@ -402,14 +427,15 @@ export default function ExtractedResults({ data, onReset }) {
                     <React.Fragment key={index}>
                       <tr className="hover:bg-background/40 transition-colors">
                         {/* Test Name */}
-                        <td className="py-3 px-4 font-semibold text-charcoal">
-                          <div className="flex items-center space-x-1.5">
+                        <td className="py-3.5 px-4 font-semibold text-charcoal">
+                          <div className="flex items-center space-x-2">
                             <span>{test.testName}</span>
                             {testExplanation && (
                               <button
+                                type="button"
                                 onClick={() => toggleTestExpand(test.testName)}
                                 className="text-charcoal-muted hover:text-primary transition-colors cursor-pointer"
-                                title="Toggle AI clinical context"
+                                title="Toggle educational explanation"
                               >
                                 {isExpanded ? (
                                   <ChevronUp className="w-3.5 h-3.5" />
@@ -427,12 +453,12 @@ export default function ExtractedResults({ data, onReset }) {
                         </td>
 
                         {/* Observed Value */}
-                        <td className="py-3 px-4 font-mono font-medium text-charcoal">
+                        <td className="py-3.5 px-4 font-mono font-bold text-charcoal">
                           {String(test.value)}
                         </td>
 
                         {/* Unit */}
-                        <td className="py-3 px-4">
+                        <td className="py-3.5 px-4">
                           {test.unit ? (
                             <span className="font-mono text-xs text-charcoal-muted">
                               {test.unit}
@@ -445,7 +471,7 @@ export default function ExtractedResults({ data, onReset }) {
                         </td>
 
                         {/* Reference Range */}
-                        <td className="py-3 px-4">
+                        <td className="py-3.5 px-4">
                           {test.referenceRange ? (
                             <span className="font-mono text-xs text-charcoal">
                               {test.referenceRange}
@@ -458,18 +484,18 @@ export default function ExtractedResults({ data, onReset }) {
                         </td>
 
                         {/* Calculated Status Badge */}
-                        <td className="py-3 px-4">
+                        <td className="py-3.5 px-4">
                           {renderStatusBadge(test)}
                         </td>
 
                         {/* Printed Report Flag & Discrepancy Alert */}
-                        <td className="py-3 px-4">
+                        <td className="py-3.5 px-4">
                           <div className="space-y-1">
                             {renderPrintedFlagBadge(test)}
 
                             {test.flagDiscrepancy?.hasDiscrepancy && (
                               <div
-                                className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-900 border border-amber-300"
+                                className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-900 border border-amber-300"
                                 title={test.flagDiscrepancy.message}
                               >
                                 <AlertTriangle className="w-2.5 h-2.5 text-amber-700 shrink-0" />
@@ -482,18 +508,18 @@ export default function ExtractedResults({ data, onReset }) {
 
                       {/* Expandable AI Explanation Row (Desktop) */}
                       {isExpanded && testExplanation && (
-                        <tr className="bg-accent-soft/10">
-                          <td colSpan="6" className="py-2.5 px-4 text-xs text-charcoal border-b border-border/60">
-                            <div className="flex items-start space-x-2 pl-2 border-l-2 border-primary/50">
-                              <Sparkles className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                        <tr className="bg-background/40">
+                          <td colSpan="6" className="py-3 px-4 text-xs text-charcoal border-b border-border/70">
+                            <div className="p-3 rounded-lg bg-surface border border-border border-l-4 border-l-primary flex items-start space-x-3 shadow-soft-sm">
+                              <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                               <div className="space-y-1">
                                 <p>
                                   <span className="font-semibold text-charcoal">What it measures:</span>{' '}
-                                  <span className="text-charcoal-muted">{testExplanation.whatItMeasures}</span>
+                                  <span className="text-charcoal-muted leading-relaxed">{testExplanation.whatItMeasures}</span>
                                 </p>
                                 <p>
                                   <span className="font-semibold text-charcoal">Report context:</span>{' '}
-                                  <span className="text-charcoal-muted">{testExplanation.findingSummary}</span>
+                                  <span className="text-charcoal-muted leading-relaxed">{testExplanation.findingSummary}</span>
                                 </p>
                               </div>
                             </div>
@@ -580,9 +606,9 @@ export default function ExtractedResults({ data, onReset }) {
                       )}
 
                       {test.flagDiscrepancy?.hasDiscrepancy && (
-                        <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start space-x-1.5">
+                        <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-start space-x-1.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
-                          <span className="leading-tight">
+                          <span className="leading-tight font-medium">
                             {test.flagDiscrepancy.message ||
                               'Report printed flag conflicts with calculated status.'}
                           </span>
@@ -595,29 +621,30 @@ export default function ExtractedResults({ data, onReset }) {
                   {testExplanation && (
                     <div className="pt-2 border-t border-border/60">
                       <button
+                        type="button"
                         onClick={() => toggleTestExpand(test.testName)}
                         className="w-full flex items-center justify-between text-xs text-primary font-medium hover:text-primary-hover cursor-pointer py-1"
                       >
                         <span className="flex items-center space-x-1.5">
-                          <Sparkles className="w-3.5 h-3.5" />
+                          <Sparkles className="w-3.5 h-3.5 text-primary" />
                           <span>{isExpanded ? 'Hide Educational Context' : 'View Educational Context'}</span>
                         </span>
                         {isExpanded ? (
-                          <ChevronUp className="w-3.5 h-3.5" />
+                          <ChevronUp className="w-3.5 h-3.5 text-primary" />
                         ) : (
-                          <ChevronDown className="w-3.5 h-3.5" />
+                          <ChevronDown className="w-3.5 h-3.5 text-primary" />
                         )}
                       </button>
 
                       {isExpanded && (
-                        <div className="mt-2 p-2.5 rounded-lg bg-accent-soft/10 border-l-2 border-primary/50 text-xs space-y-1.5 text-charcoal animate-fadeIn">
+                        <div className="mt-2 p-3 rounded-lg bg-background/70 border-l-3 border-primary text-xs space-y-1.5 text-charcoal animate-fadeIn">
                           <p>
                             <span className="font-semibold text-charcoal">What it measures:</span>{' '}
-                            <span className="text-charcoal-muted">{testExplanation.whatItMeasures}</span>
+                            <span className="text-charcoal-muted leading-relaxed">{testExplanation.whatItMeasures}</span>
                           </p>
                           <p>
                             <span className="font-semibold text-charcoal">Report context:</span>{' '}
-                            <span className="text-charcoal-muted">{testExplanation.findingSummary}</span>
+                            <span className="text-charcoal-muted leading-relaxed">{testExplanation.findingSummary}</span>
                           </p>
                         </div>
                       )}
@@ -634,8 +661,8 @@ export default function ExtractedResults({ data, onReset }) {
       <div className="pt-4 border-t border-border flex items-start space-x-2.5 text-xs text-charcoal-muted">
         <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
         <p>
-          <span className="font-semibold text-charcoal">Educational Guidance & Safety Policy:</span>{' '}
-          Explanations are strictly educational and generated from actual extracted records and deterministic evaluation results. In accordance with clinical safety principles, out-of-range results are never treated as diagnoses, and no medications, dosages, or treatments are prescribed.
+          <span className="font-semibold text-charcoal">Educational Guidance & Safety:</span>{' '}
+          HealthLens AI provides mathematical comparisons against reference ranges reported by the laboratory. Educational explanations do not replace medical evaluation. Always discuss lab results with a qualified healthcare professional.
         </p>
       </div>
     </div>

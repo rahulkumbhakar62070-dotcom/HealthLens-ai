@@ -1,10 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
+import connectDB from './config/db.js';
 import reportRoutes from './routes/reportRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
+
+// Connect to MongoDB
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,8 +36,10 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
 
 // Health Check Endpoint

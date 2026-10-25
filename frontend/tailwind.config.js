@@ -16,7 +16,7 @@ export default {
         },
         charcoal: {
           DEFAULT: '#202923',
-          muted: '#69746D',
+          muted: '#68736D',
         },
         accent: {
           soft: '#DCE9D8',

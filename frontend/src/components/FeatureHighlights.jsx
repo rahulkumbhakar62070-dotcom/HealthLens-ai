@@ -1,59 +1,55 @@
 import React from 'react';
-import { CheckCheck, Cpu, Eye, FileSpreadsheet } from 'lucide-react';
 
 export default function FeatureHighlights() {
-  const features = [
+  const steps = [
     {
-      icon: FileSpreadsheet,
-      title: 'Deterministic Range Evaluation',
+      step: '1',
+      title: 'Upload Your Report',
       description:
-        'Observed test values are strictly compared against the numerical reference ranges stated directly inside your uploaded report. No external guesses or arbitrary baselines.',
+        'Upload your text-based laboratory PDF report directly from your device. Documents are processed securely in session.',
     },
     {
-      icon: CheckCheck,
-      title: 'Honest Status Flagging',
+      step: '2',
+      title: 'Review Your Test Results',
       description:
-        'Findings are explicitly categorized as Within Range, Below Range, or Above Range. If a range is non-numeric or missing, it is labeled Not Evaluated with full transparency.',
+        'Examine extracted test values, measurement units, and automated comparisons against the report\'s printed reference intervals.',
     },
     {
-      icon: Cpu,
-      title: 'Educational Gemini Summaries',
+      step: '3',
+      title: 'Understand Your Results',
       description:
-        'Validated tests receive simple, plain-language explanations powered by the Gemini API, explaining what the biological marker measures without diagnosing or prescribing.',
+        'Read concise, educational explanations for each biological marker to help you prepare informed questions for your doctor.',
     },
   ];
 
   return (
-    <section className="mt-12">
+    <section className="mt-12 pt-2">
       <div className="text-center mb-8">
         <h3 className="text-xl sm:text-2xl font-heading font-bold text-charcoal">
-          How HealthLens AI Ensures Integrity
+          How It Works
         </h3>
         <p className="mt-1.5 text-sm text-charcoal-muted max-w-xl mx-auto">
-          Built for high accuracy and patient safety during our hackathon build.
+          A clear, transparent workflow to understand your laboratory report.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {features.map((feature, idx) => {
-          const Icon = feature.icon;
-          return (
-            <div
-              key={idx}
-              className="bg-surface rounded-xl p-6 border border-border shadow-soft-sm hover:shadow-soft transition-all"
-            >
-              <div className="w-10 h-10 rounded-lg bg-accent-soft/70 flex items-center justify-center text-primary mb-4">
-                <Icon className="w-5 h-5 text-primary" />
-              </div>
-              <h4 className="font-heading font-bold text-base text-charcoal mb-2">
-                {feature.title}
-              </h4>
-              <p className="text-xs sm:text-sm text-charcoal-muted leading-relaxed">
-                {feature.description}
-              </p>
+        {steps.map((item) => (
+          <div
+            key={item.step}
+            className="bg-surface rounded-xl p-6 border border-border shadow-soft-sm"
+          >
+            <div className="w-8 h-8 rounded-lg bg-accent-soft/80 flex items-center justify-center text-primary font-heading font-bold text-sm mb-4">
+              {item.step}
             </div>
-          );
-        })}
+            <h4 className="font-heading font-bold text-base text-charcoal mb-2">
+              {item.title}
+            </h4>
+            <p className="text-xs sm:text-sm text-charcoal-muted leading-relaxed">
+              {item.description}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );

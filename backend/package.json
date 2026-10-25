@@ -14,11 +14,14 @@
     "test:flow": "node tests/dashboard_flow.test.js",
     "test:layout": "node tests/layout_transition.test.js",
     "test:benchmark": "node tests/benchmark.test.js",
+    "test:auth": "node tests/auth.test.js",
     "adaption:generate": "node scripts/generate_adaption_dataset.js",
     "adaption:verify": "node tests/verify_adaption_connection.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

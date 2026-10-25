@@ -182,13 +182,13 @@ export default function UploadSection({ onAnalysisChange }) {
 
       {!isAnalyzed ? (
         /* Upload Box Card (When no report has been successfully analyzed) */
-        <div className="bg-surface rounded-2xl border border-border shadow-soft p-6 sm:p-8">
+        <div id="upload-card" className="bg-surface rounded-2xl border border-border shadow-soft p-6 sm:p-8">
           <div className="max-w-2xl mx-auto text-center mb-6">
             <h2 className="text-2xl sm:text-3xl font-heading font-bold text-charcoal">
-              Upload Medical Report PDF
+              Analyze Your Lab Report
             </h2>
             <p className="mt-2 text-sm text-charcoal-muted">
-              Upload a text-based laboratory PDF (CBC, Metabolic Panel, Lipid Profile, etc.). HealthLens AI extracts test parameters, evaluates reference intervals deterministically, and provides clear educational explanations.
+              Upload a PDF to review your extracted test results.
             </p>
           </div>
 
@@ -201,7 +201,7 @@ export default function UploadSection({ onAnalysisChange }) {
             onClick={() => {
               if (!isUploading) fileInputRef.current?.click();
             }}
-            className={`relative border-2 border-dashed rounded-xl p-8 sm:p-12 text-center transition-all ${
+            className={`relative border-2 border-dashed rounded-xl p-8 sm:p-10 text-center transition-all ${
               isUploading
                 ? 'opacity-70 cursor-not-allowed border-primary/40 bg-accent-soft/10'
                 : dragActive
@@ -210,11 +210,11 @@ export default function UploadSection({ onAnalysisChange }) {
             }`}
           >
             <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="w-16 h-16 rounded-2xl bg-accent-soft flex items-center justify-center text-primary shadow-soft-sm">
+              <div className="w-12 h-12 rounded-xl bg-accent-soft/80 flex items-center justify-center text-primary shadow-soft-sm">
                 {isUploading ? (
-                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                  <Loader2 className="w-6 h-6 text-primary animate-spin" />
                 ) : (
-                  <UploadCloud className="w-8 h-8 text-primary" />
+                  <UploadCloud className="w-6 h-6 text-primary" />
                 )}
               </div>
 
@@ -234,19 +234,32 @@ export default function UploadSection({ onAnalysisChange }) {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-1">
-                  <p className="text-base font-semibold text-charcoal">
-                    <span className="text-primary hover:underline">Click to browse</span> or drag and drop your report
-                  </p>
-                  <p className="text-xs text-charcoal-muted">
-                    PDF files only • Maximum size: 5 MB • Digital text-based reports (OCR unsupported)
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm sm:text-base font-semibold text-charcoal">
+                      Drag and drop your report here, or
+                    </p>
+                  </div>
+
+                  <div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                      className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-surface border border-border hover:border-primary/50 text-charcoal hover:text-primary text-xs font-semibold shadow-soft-sm transition-all cursor-pointer"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-primary" />
+                      <span>Browse PDF</span>
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-charcoal-muted pt-2 border-t border-border/60 max-w-md mx-auto">
+                    PDF files up to 5 MB · Text-based digital reports (scanned files without digital text are not supported)
                   </p>
                 </div>
               )}
-
-              <p className="text-[11px] text-charcoal-muted/80">
-                Privacy-first • In-memory extraction • Zero server retention
-              </p>
             </div>
           </div>
 
@@ -333,11 +346,11 @@ export default function UploadSection({ onAnalysisChange }) {
           <div className="mt-6 pt-5 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-charcoal-muted">
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span>Privacy-First Architecture: Documents analyzed ephemerally in memory with zero disk retention.</span>
+              <span>Secure session processing · Zero persistent storage of personal health data</span>
             </div>
             <div className="text-charcoal-muted flex items-center space-x-1.5">
               <FileCheck className="w-3.5 h-3.5 text-primary" />
-              <span>Deterministic Range Comparison</span>
+              <span>Deterministic reference-range evaluation</span>
             </div>
           </div>
         </div>
