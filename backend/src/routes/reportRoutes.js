@@ -9,6 +9,7 @@ import {
   CorruptPdfError,
 } from '../services/pdfService.js';
 import { parseMedicalReportText } from '../services/parserService.js';
+import { evaluateMedicalTest, EVAL_STATUS } from '../services/evaluatorService.js';
 
 const router = express.Router();
 
@@ -49,7 +50,7 @@ const sanitizeFilename = (filename) => {
 };
 
 /**
- * Core handler for PDF upload, text extraction, and medical data parsing.
+ * Core handler for PDF upload, text extraction, medical data parsing, and reference-range evaluation.
  */
 const processReportHandler = async (req, res) => {
   const file = req.file;
@@ -89,15 +90,28 @@ const processReportHandler = async (req, res) => {
     // 6. Parse structured medical test items from extracted text
     const parsedData = parseMedicalReportText(rawText);
 
-    // 7. Sanitize filename
+    // 7. Deterministically evaluate each extracted test against its report reference range
+    const evaluatedTests = parsedData.tests.map((test) => evaluateMedicalTest(test));
+
+    // Calculate evaluation summary metrics
+    const evaluationSummary = {
+      total: evaluatedTests.length,
+      normalCount: evaluatedTests.filter((t) => t.status === EVAL_STATUS.NORMAL).length,
+      lowCount: evaluatedTests.filter((t) => t.status === EVAL_STATUS.LOW).length,
+      highCount: evaluatedTests.filter((t) => t.status === EVAL_STATUS.HIGH).length,
+      notEvaluatedCount: evaluatedTests.filter((t) => t.status === EVAL_STATUS.NOT_EVALUATED).length,
+      discrepancyCount: evaluatedTests.filter((t) => t.flagDiscrepancy?.hasDiscrepancy).length,
+    };
+
+    // 8. Sanitize filename
     const sanitizedName = sanitizeFilename(file.originalname);
 
-    // 8. Build informative response message
+    // 9. Build informative response message
     let message = 'PDF uploaded and validated successfully';
-    if (parsedData.testCount > 0) {
-      message = `Report processed successfully: ${parsedData.testCount} medical test${
-        parsedData.testCount === 1 ? '' : 's'
-      } extracted`;
+    if (evaluatedTests.length > 0) {
+      message = `Report processed successfully: ${evaluatedTests.length} medical test${
+        evaluatedTests.length === 1 ? '' : 's'
+      } extracted and evaluated`;
     } else {
       message =
         'PDF uploaded and digital text extracted, but no recognizable clinical test results were found.';
@@ -112,8 +126,9 @@ const processReportHandler = async (req, res) => {
         mimeType: 'application/pdf',
       },
       rawTextLength: parsedData.rawTextLength,
-      testCount: parsedData.testCount,
-      tests: parsedData.tests,
+      testCount: evaluatedTests.length,
+      tests: evaluatedTests,
+      evaluationSummary,
       warnings: parsedData.warnings,
     });
   } catch (err) {
@@ -147,7 +162,7 @@ const processReportHandler = async (req, res) => {
       message: 'An internal error occurred while processing the uploaded file.',
     });
   } finally {
-    // 9. Ephemeral storage: immediately clean up temporary file from disk on success OR error
+    // 10. Ephemeral storage: immediately clean up temporary file from disk on success OR error
     if (file && file.path) {
       try {
         await fs.promises.unlink(file.path);
@@ -160,13 +175,13 @@ const processReportHandler = async (req, res) => {
 
 /**
  * POST /api/reports/upload
- * Primary upload and extraction endpoint.
+ * Primary upload, extraction, and evaluation endpoint.
  */
 router.post('/upload', handleReportUpload, processReportHandler);
 
 /**
  * POST /api/reports/extract
- * Dedicated semantic alias endpoint for report extraction.
+ * Dedicated semantic alias endpoint for report extraction and evaluation.
  */
 router.post('/extract', handleReportUpload, processReportHandler);
 

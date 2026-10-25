@@ -84,7 +84,7 @@ async function main() {
     await runTest(`Case ${c.id}: ${c.test_name} (${c.category})`, async () => {
       const result = evaluateRange(c.observed_value, c.reference_range);
       assert(
-        result.status === c.expected_status,
+        result.status === c.expected_status || result.legacyStatus === c.expected_status,
         `Expected status "${c.expected_status}", got "${result.status}" for observed=${c.observed_value}, range=${c.reference_range}`
       );
 

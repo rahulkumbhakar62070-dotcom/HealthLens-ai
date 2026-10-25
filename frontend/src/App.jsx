@@ -51,7 +51,7 @@ export default function App() {
           <div className="flex items-center space-x-6 text-center sm:text-right">
             <span>Solo Hackathon Project</span>
             <span>•</span>
-            <span className="text-primary font-medium">Phase 3: Extraction & Medical Data Validation Complete</span>
+            <span className="text-primary font-medium">Phase 4: Deterministic Reference-Range Evaluation Complete</span>
           </div>
         </div>
       </footer>

@@ -231,7 +231,10 @@ async function main() {
 
     // Evaluator unit test regression
     const evalRes = evaluateRange(3.2, '3.5 - 5.1');
-    assert(evalRes.status === 'Below Range', `Expected Below Range, got ${evalRes.status}`);
+    assert(
+      evalRes.status === 'LOW' || evalRes.legacyStatus === 'Below Range',
+      `Expected LOW or Below Range, got ${evalRes.status}`
+    );
   });
 
   console.log('\n======================================================');

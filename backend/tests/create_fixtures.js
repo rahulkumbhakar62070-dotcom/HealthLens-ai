@@ -193,4 +193,21 @@ const nonMedicalPdf = createSyntheticPdf([
 ]);
 fs.writeFileSync(path.join(FIXTURES_DIR, 'non_medical_doc.pdf'), nonMedicalPdf);
 
+// 13. Comprehensive Evaluation PDF (Phase 4 Requirement)
+const evaluationPdf = createSyntheticPdf([
+  'COMPREHENSIVE METABOLIC AND LIPID EVALUATION REPORT',
+  'Collection Date: 2026-10-25',
+  'Test Name Result Unit Reference Interval Flag',
+  'Serum Potassium 3.1 mEq/L 3.5 - 5.1',
+  'Serum Sodium 140 mEq/L 136 - 145',
+  'Glucose, Fasting 135 mg/dL 70 - 99 H',
+  'Hemoglobin 12.0 g/dL 12.0 - 15.5',
+  'Serum Calcium 10.2 mg/dL 8.6 - 10.2',
+  'Total Cholesterol 200 mg/dL < 200',
+  'eGFR 55 mL/min > 60',
+  'Experimental Biomarker Alpha 45.0 ng/mL',
+  'Conflicting Marker 14.0 g/dL 12.0 - 15.5 H',
+]);
+fs.writeFileSync(path.join(FIXTURES_DIR, 'evaluation_comprehensive.pdf'), evaluationPdf);
+
 console.log('Test fixtures created successfully in:', FIXTURES_DIR);

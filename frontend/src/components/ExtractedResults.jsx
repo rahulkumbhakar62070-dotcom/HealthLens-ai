@@ -6,20 +6,38 @@ import {
   RotateCcw,
   Search,
   Info,
-  SlidersHorizontal,
   Layers,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus,
+  HelpCircle,
+  ShieldCheck,
+  AlertCircle,
 } from 'lucide-react';
 
 export default function ExtractedResults({ data, onReset }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'NORMAL' | 'LOW' | 'HIGH' | 'NOT_EVALUATED'
 
   if (!data) return null;
 
-  const { file, testCount = 0, tests = [], warnings = [], rawTextLength = 0 } = data;
+  const {
+    file,
+    testCount = 0,
+    tests = [],
+    evaluationSummary = {},
+    warnings = [],
+    rawTextLength = 0,
+  } = data;
 
-  const filteredTests = tests.filter((t) =>
-    t.testName.toLowerCase().includes(searchTerm.toLowerCase().trim())
-  );
+  const filteredTests = tests.filter((t) => {
+    const matchesSearch = t.testName.toLowerCase().includes(searchTerm.toLowerCase().trim());
+    const matchesStatus =
+      statusFilter === 'ALL' ||
+      t.status === statusFilter ||
+      (statusFilter === 'DISCREPANCY' && t.flagDiscrepancy?.hasDiscrepancy);
+    return matchesSearch && matchesStatus;
+  });
 
   const formatFileSize = (bytes) => {
     if (!bytes) return '0 B';
@@ -28,25 +46,33 @@ export default function ExtractedResults({ data, onReset }) {
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
+  const normalCount = evaluationSummary.normalCount ?? tests.filter((t) => t.status === 'NORMAL').length;
+  const lowCount = evaluationSummary.lowCount ?? tests.filter((t) => t.status === 'LOW').length;
+  const highCount = evaluationSummary.highCount ?? tests.filter((t) => t.status === 'HIGH').length;
+  const notEvalCount =
+    evaluationSummary.notEvaluatedCount ?? tests.filter((t) => t.status === 'NOT_EVALUATED').length;
+  const discrepancyCount =
+    evaluationSummary.discrepancyCount ?? tests.filter((t) => t.flagDiscrepancy?.hasDiscrepancy).length;
+
   return (
     <div className="bg-surface rounded-2xl border border-border shadow-soft p-6 sm:p-8 space-y-6 animate-fadeIn">
       {/* Top Banner: Success & Metadata */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-border gap-4">
         <div className="flex items-start space-x-3.5">
           <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center text-primary shrink-0">
-            <CheckCircle2 className="w-6 h-6 text-primary" />
+            <ShieldCheck className="w-6 h-6 text-primary" />
           </div>
           <div>
             <div className="flex items-center space-x-2.5 flex-wrap">
               <h2 className="text-xl sm:text-2xl font-heading font-bold text-charcoal">
-                Extraction Complete
+                Medical Report Evaluation
               </h2>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                {testCount} {testCount === 1 ? 'Marker' : 'Markers'} Detected
+                {testCount} {testCount === 1 ? 'Marker' : 'Markers'} Evaluated
               </span>
             </div>
             <p className="text-xs sm:text-sm text-charcoal-muted mt-1">
-              Extracted directly from digital text in{' '}
+              Deterministic evaluation against ranges in{' '}
               <span className="font-semibold text-charcoal">{file?.name || 'Uploaded PDF'}</span> (
               {formatFileSize(file?.size)})
             </p>
@@ -63,12 +89,105 @@ export default function ExtractedResults({ data, onReset }) {
         </button>
       </div>
 
+      {/* Summary KPI Badges */}
+      {testCount > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <button
+            onClick={() => setStatusFilter('ALL')}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+              statusFilter === 'ALL'
+                ? 'bg-primary/5 border-primary ring-1 ring-primary'
+                : 'bg-background/60 border-border hover:border-primary/50'
+            }`}
+          >
+            <p className="text-[11px] font-medium text-charcoal-muted uppercase">Total Markers</p>
+            <p className="text-xl font-heading font-bold text-charcoal mt-0.5">{testCount}</p>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('NORMAL')}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+              statusFilter === 'NORMAL'
+                ? 'bg-emerald-50 border-emerald-500 ring-1 ring-emerald-500'
+                : 'bg-emerald-50/40 border-emerald-200/80 hover:border-emerald-400'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-medium text-emerald-800 uppercase">Within Range</p>
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            </div>
+            <p className="text-xl font-heading font-bold text-emerald-950 mt-0.5">{normalCount}</p>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('LOW')}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+              statusFilter === 'LOW'
+                ? 'bg-sky-50 border-sky-500 ring-1 ring-sky-500'
+                : 'bg-sky-50/40 border-sky-200/80 hover:border-sky-400'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-medium text-sky-800 uppercase">Below Range</p>
+              <ArrowDownRight className="w-3.5 h-3.5 text-sky-600" />
+            </div>
+            <p className="text-xl font-heading font-bold text-sky-950 mt-0.5">{lowCount}</p>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('HIGH')}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+              statusFilter === 'HIGH'
+                ? 'bg-rose-50 border-rose-500 ring-1 ring-rose-500'
+                : 'bg-rose-50/40 border-rose-200/80 hover:border-rose-400'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-medium text-rose-800 uppercase">Above Range</p>
+              <ArrowUpRight className="w-3.5 h-3.5 text-rose-600" />
+            </div>
+            <p className="text-xl font-heading font-bold text-rose-950 mt-0.5">{highCount}</p>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('NOT_EVALUATED')}
+            className={`p-3 rounded-xl border text-left transition-all col-span-2 sm:col-span-1 cursor-pointer ${
+              statusFilter === 'NOT_EVALUATED'
+                ? 'bg-amber-50 border-amber-500 ring-1 ring-amber-500'
+                : 'bg-amber-50/40 border-amber-200/80 hover:border-amber-400'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-medium text-amber-800 uppercase">Not Evaluated</p>
+              <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
+            </div>
+            <p className="text-xl font-heading font-bold text-amber-950 mt-0.5">{notEvalCount}</p>
+          </button>
+        </div>
+      )}
+
+      {/* Flag Discrepancy Banner (if detected) */}
+      {discrepancyCount > 0 && (
+        <div className="p-4 rounded-xl bg-amber-50/90 border border-amber-300 text-amber-900 flex items-start space-x-3 text-xs sm:text-sm">
+          <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-semibold text-amber-900">
+              Printed Flag Conflict Detected ({discrepancyCount}{' '}
+              {discrepancyCount === 1 ? 'discrepancy' : 'discrepancies'})
+            </p>
+            <p className="text-amber-800">
+              One or more tests contain an explicit printed report flag (e.g., &quot;H&quot;) that conflicts with the deterministic mathematical comparison against the report&apos;s stated reference interval. Both the printed flag and calculated status are preserved without silent alteration.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Warnings / Notices */}
       {warnings && warnings.length > 0 && (
-        <div className="p-4 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 flex items-start space-x-3 text-xs sm:text-sm">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-background border border-border text-charcoal-muted flex items-start space-x-3 text-xs sm:text-sm">
+          <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <p className="font-semibold text-amber-800">Extraction Notice</p>
+            <p className="font-semibold text-charcoal">Report Notice</p>
             {warnings.map((w, idx) => (
               <p key={idx}>{w}</p>
             ))}
@@ -84,12 +203,12 @@ export default function ExtractedResults({ data, onReset }) {
             No Recognizable Test Markers Found
           </h3>
           <p className="text-xs sm:text-sm text-charcoal-muted max-w-md mx-auto">
-            The PDF was parsed successfully ({rawTextLength} characters read), but no standard laboratory test rows (e.g., CBC, Lipid, Metabolic) could be recognized. Please verify the document format.
+            The PDF was parsed successfully ({rawTextLength} characters read), but no standard laboratory test rows could be recognized. Please upload a structured laboratory test report.
           </p>
         </div>
       )}
 
-      {/* Filter / Search Bar (if tests exist) */}
+      {/* Search Bar & Table Filter */}
       {testCount > 0 && (
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -117,6 +236,7 @@ export default function ExtractedResults({ data, onReset }) {
                   <th className="py-3 px-4">Observed Value</th>
                   <th className="py-3 px-4">Unit</th>
                   <th className="py-3 px-4">Report Reference Range</th>
+                  <th className="py-3 px-4">Calculated Status</th>
                   <th className="py-3 px-4">Printed Flag</th>
                 </tr>
               </thead>
@@ -128,7 +248,12 @@ export default function ExtractedResults({ data, onReset }) {
                   >
                     {/* Test Name */}
                     <td className="py-3 px-4 font-semibold text-charcoal">
-                      {test.testName}
+                      <div>{test.testName}</div>
+                      {test.boundaryInfo?.isBoundary && (
+                        <span className="inline-block mt-0.5 text-[10px] font-medium text-charcoal-muted bg-background px-1.5 py-0.5 rounded border border-border">
+                          Boundary ({test.boundaryInfo.boundaryType || 'exact'})
+                        </span>
+                      )}
                     </td>
 
                     {/* Observed Value */}
@@ -162,25 +287,75 @@ export default function ExtractedResults({ data, onReset }) {
                       )}
                     </td>
 
-                    {/* Printed Report Flag */}
+                    {/* Calculated Status Badge (Phase 4) */}
                     <td className="py-3 px-4">
-                      {test.printedFlag ? (
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
-                            test.printedFlag.toUpperCase().includes('H') ||
-                            test.printedFlag.toUpperCase().includes('HIGH')
-                              ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                              : test.printedFlag.toUpperCase().includes('L') ||
-                                test.printedFlag.toUpperCase().includes('LOW')
-                              ? 'bg-sky-50 text-sky-700 border border-sky-200'
-                              : 'bg-amber-50 text-amber-700 border border-amber-200'
-                          }`}
-                        >
-                          {test.printedFlag}
+                      {test.status === 'NORMAL' && (
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span>Within Range</span>
                         </span>
-                      ) : (
-                        <span className="text-charcoal-muted text-xs">—</span>
                       )}
+
+                      {test.status === 'LOW' && (
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200">
+                          <ArrowDownRight className="w-3 h-3 text-sky-600" />
+                          <span>Below Range</span>
+                        </span>
+                      )}
+
+                      {test.status === 'HIGH' && (
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+                          <ArrowUpRight className="w-3 h-3 text-rose-600" />
+                          <span>Above Range</span>
+                        </span>
+                      )}
+
+                      {test.status === 'NOT_EVALUATED' && (
+                        <div className="space-y-0.5">
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                            <HelpCircle className="w-3 h-3 text-amber-600" />
+                            <span>Not Evaluated</span>
+                          </span>
+                          {test.evaluationReason && (
+                            <p className="text-[10px] text-charcoal-muted leading-tight">
+                              {test.evaluationReason}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Printed Report Flag & Discrepancy Alert */}
+                    <td className="py-3 px-4">
+                      <div className="space-y-1">
+                        {test.printedFlag ? (
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
+                              test.printedFlag.toUpperCase().includes('H') ||
+                              test.printedFlag.toUpperCase().includes('HIGH')
+                                ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                : test.printedFlag.toUpperCase().includes('L') ||
+                                  test.printedFlag.toUpperCase().includes('LOW')
+                                ? 'bg-sky-50 text-sky-700 border border-sky-200'
+                                : 'bg-amber-50 text-amber-700 border border-amber-200'
+                            }`}
+                          >
+                            {test.printedFlag}
+                          </span>
+                        ) : (
+                          <span className="text-charcoal-muted text-xs">—</span>
+                        )}
+
+                        {test.flagDiscrepancy?.hasDiscrepancy && (
+                          <div
+                            className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-900 border border-amber-300"
+                            title={test.flagDiscrepancy.message}
+                          >
+                            <AlertTriangle className="w-2.5 h-2.5 text-amber-700 shrink-0" />
+                            <span>Flag Conflict</span>
+                          </div>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -190,12 +365,12 @@ export default function ExtractedResults({ data, onReset }) {
         </div>
       )}
 
-      {/* Phase 3 Status & Transparency Note */}
+      {/* Phase 4 Status & Transparency Note */}
       <div className="pt-4 border-t border-border flex items-start space-x-2.5 text-xs text-charcoal-muted">
         <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
         <p>
-          <span className="font-semibold text-charcoal">Phase 3 Extraction Fidelity:</span>{' '}
-          All data above is extracted directly from the uploaded report. In accordance with clinical safety guidelines, values have not been evaluated as normal or abnormal in this phase, and missing fields are explicitly highlighted without fabrication.
+          <span className="font-semibold text-charcoal">Phase 4 Reference-Range Evaluation:</span>{' '}
+          All observed test markers are evaluated strictly and deterministically against the reference intervals stated directly in the uploaded document. Boundary behavior is explicitly established without assuming normalcy on strict limits. In accordance with clinical safety principles, HealthLens AI does not diagnose disease or prescribe treatments.
         </p>
       </div>
     </div>
