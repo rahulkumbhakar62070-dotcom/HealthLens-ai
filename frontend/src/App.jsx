@@ -51,7 +51,7 @@ export default function App() {
           <div className="flex items-center space-x-6 text-center sm:text-right">
             <span>Solo Hackathon Project</span>
             <span>•</span>
-            <span className="text-primary font-medium">Phase 5: Gemini AI Explanations Complete</span>
+            <span className="text-primary font-medium">Phase 6: Frontend Integration & Results Dashboard Complete</span>
           </div>
         </div>
       </footer>

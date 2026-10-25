@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   UploadCloud,
   FileText,
@@ -9,6 +9,9 @@ import {
   Loader2,
   ArrowRight,
   Database,
+  Sparkles,
+  Search,
+  FileCheck,
 } from 'lucide-react';
 import ExtractedResults from './ExtractedResults.jsx';
 
@@ -17,10 +20,30 @@ export default function UploadSection() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [validationError, setValidationError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadStep, setUploadStep] = useState(0); // 0: upload, 1: text extraction, 2: range eval, 3: AI synthesis
   const [uploadResult, setUploadResult] = useState(null);
 
   const fileInputRef = useRef(null);
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+  const PROCESSING_STEPS = [
+    'Validating PDF signature and binary structure...',
+    'Extracting laboratory digital text and test parameters...',
+    'Performing deterministic reference-range mathematical evaluation...',
+    'Synthesizing patient-friendly educational explanations...',
+  ];
+
+  // Rotate processing steps while uploading to provide rich user feedback
+  useEffect(() => {
+    let interval;
+    if (isUploading) {
+      setUploadStep(0);
+      interval = setInterval(() => {
+        setUploadStep((prev) => (prev < PROCESSING_STEPS.length - 1 ? prev + 1 : prev));
+      }, 900);
+    }
+    return () => clearInterval(interval);
+  }, [isUploading]);
 
   const validateAndSetFile = (file) => {
     setValidationError('');
@@ -81,6 +104,7 @@ export default function UploadSection() {
     setSelectedFile(null);
     setValidationError('');
     setUploadResult(null);
+    setUploadStep(0);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -116,10 +140,12 @@ export default function UploadSection() {
 
       setUploadResult({
         success: true,
-        message: data.message || 'PDF uploaded and parsed successfully',
+        message: data.message || 'PDF uploaded, parsed, and evaluated successfully',
         file: data.file,
         testCount: data.testCount ?? 0,
         tests: data.tests ?? [],
+        evaluationSummary: data.evaluationSummary ?? {},
+        aiExplanation: data.aiExplanation ?? null,
         warnings: data.warnings ?? [],
         rawTextLength: data.rawTextLength ?? 0,
       });
@@ -144,7 +170,7 @@ export default function UploadSection() {
             Upload Medical Report PDF
           </h2>
           <p className="mt-2 text-sm text-charcoal-muted">
-            Upload a digital laboratory report PDF (CBC, Metabolic Panel, Lipid Profile, etc.). HealthLens AI extracts test names, observed values, units, and reference ranges without fabrication.
+            Upload a text-based laboratory PDF (CBC, Metabolic Panel, Lipid Profile, etc.). HealthLens AI extracts test parameters, evaluates reference intervals deterministically, and provides clear educational explanations.
           </p>
         </div>
 
@@ -159,7 +185,7 @@ export default function UploadSection() {
           }}
           className={`relative border-2 border-dashed rounded-xl p-8 sm:p-12 text-center transition-all ${
             isUploading
-              ? 'opacity-60 cursor-not-allowed border-border bg-background/30'
+              ? 'opacity-70 cursor-not-allowed border-primary/40 bg-accent-soft/10'
               : dragActive
               ? 'border-primary bg-accent-soft/30 scale-[0.99] cursor-pointer'
               : 'border-border hover:border-primary/60 bg-background/50 hover:bg-background/80 cursor-pointer'
@@ -177,17 +203,38 @@ export default function UploadSection() {
 
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="w-16 h-16 rounded-2xl bg-accent-soft flex items-center justify-center text-primary shadow-soft-sm">
-              <UploadCloud className="w-8 h-8 text-primary" />
+              {isUploading ? (
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              ) : (
+                <UploadCloud className="w-8 h-8 text-primary" />
+              )}
             </div>
 
-            <div className="space-y-1">
-              <p className="text-base font-semibold text-charcoal">
-                <span className="text-primary hover:underline">Click to browse</span> or drag and drop your report
-              </p>
-              <p className="text-xs text-charcoal-muted">
-                PDF files only • Maximum size: 5 MB • Digital text-based reports (OCR unsupported)
-              </p>
-            </div>
+            {isUploading ? (
+              <div className="space-y-2 max-w-md mx-auto">
+                <p className="text-sm font-semibold text-primary animate-pulse">
+                  {PROCESSING_STEPS[uploadStep]}
+                </p>
+                <div className="w-full bg-border rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="bg-primary h-1.5 rounded-full transition-all duration-500"
+                    style={{ width: `${((uploadStep + 1) / PROCESSING_STEPS.length) * 100}%` }}
+                  />
+                </div>
+                <p className="text-[11px] text-charcoal-muted">
+                  Step {uploadStep + 1} of {PROCESSING_STEPS.length}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <p className="text-base font-semibold text-charcoal">
+                  <span className="text-primary hover:underline">Click to browse</span> or drag and drop your report
+                </p>
+                <p className="text-xs text-charcoal-muted">
+                  PDF files only • Maximum size: 5 MB • Digital text-based reports (OCR unsupported)
+                </p>
+              </div>
+            )}
 
             <div className="flex items-center space-x-2 text-xs text-charcoal-muted bg-surface px-3 py-1.5 rounded-full border border-border">
               <ShieldAlert className="w-3.5 h-3.5 text-primary" />
@@ -205,7 +252,7 @@ export default function UploadSection() {
         )}
 
         {/* Selected File Card & Actions */}
-        {selectedFile && (
+        {selectedFile && !uploadResult && (
           <div className="mt-6 p-4 rounded-xl bg-background border border-border space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 truncate">
@@ -217,7 +264,7 @@ export default function UploadSection() {
                     {selectedFile.name}
                   </p>
                   <p className="text-xs text-charcoal-muted">
-                    {formatFileSize(selectedFile.size)} • PDF Ready for Extraction
+                    {formatFileSize(selectedFile.size)} • PDF Ready for Analysis
                   </p>
                 </div>
               </div>
@@ -246,11 +293,11 @@ export default function UploadSection() {
                 {isUploading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-accent-soft" />
-                    <span>Extracting Medical Report Data...</span>
+                    <span>Analyzing Report...</span>
                   </>
                 ) : (
                   <>
-                    <span>Upload & Extract Medical Data</span>
+                    <span>Analyze Lab Report</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -266,6 +313,11 @@ export default function UploadSection() {
             <div className="space-y-1">
               <p className="font-semibold text-rose-800">Processing Error</p>
               <p className="text-xs sm:text-sm">{uploadResult.message}</p>
+              {uploadResult.message?.toLowerCase().includes('scanned') && (
+                <p className="text-xs text-rose-700/90 pt-1">
+                  Tip: HealthLens AI requires text-based PDF reports generated digitally by the laboratory. Scanned paper printouts or photos of reports are not supported because OCR is omitted for medical data integrity.
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -278,12 +330,12 @@ export default function UploadSection() {
           </div>
           <div className="font-medium text-primary flex items-center space-x-1.5">
             <Database className="w-3.5 h-3.5" />
-            <span>Phase 3 Active: PDF Text Extraction & Data Validation</span>
+            <span>Phase 6 Active: End-to-End Results Dashboard</span>
           </div>
         </div>
       </div>
 
-      {/* Extracted Results Table (rendered when backend returns success) */}
+      {/* Extracted Results & AI Dashboard */}
       {uploadResult && uploadResult.success && (
         <ExtractedResults data={uploadResult} onReset={clearSelection} />
       )}
