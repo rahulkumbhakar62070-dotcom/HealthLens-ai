@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "node tests/upload.test.js",
+    "test:extraction": "node tests/extraction.test.js",
     "test:benchmark": "node tests/benchmark.test.js",
     "adaption:generate": "node scripts/generate_adaption_dataset.js",
     "adaption:verify": "node tests/verify_adaption_connection.js"
@@ -16,6 +17,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "multer": "^2.5.0"
+    "multer": "^2.5.0",
+    "pdf-parse": "^2.4.5"
   }
 }

@@ -2,6 +2,13 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { handleReportUpload } from '../middleware/upload.js';
+import {
+  extractTextFromPdf,
+  ScannedPdfError,
+  PasswordProtectedPdfError,
+  CorruptPdfError,
+} from '../services/pdfService.js';
+import { parseMedicalReportText } from '../services/parserService.js';
 
 const router = express.Router();
 
@@ -42,10 +49,9 @@ const sanitizeFilename = (filename) => {
 };
 
 /**
- * POST /api/reports/upload
- * Validates medical report PDF uploads.
+ * Core handler for PDF upload, text extraction, and medical data parsing.
  */
-router.post('/upload', handleReportUpload, async (req, res) => {
+const processReportHandler = async (req, res) => {
   const file = req.file;
 
   try {
@@ -65,7 +71,7 @@ router.post('/upload', handleReportUpload, async (req, res) => {
       });
     }
 
-    // 3. Inspect genuine file signature / magic bytes (blocks renamed files)
+    // 3. Inspect genuine file signature / magic bytes (blocks renamed non-PDF files)
     const hasValidSignature = await isValidPdfSignature(file.path);
     if (!hasValidSignature) {
       return res.status(400).json({
@@ -74,27 +80,74 @@ router.post('/upload', handleReportUpload, async (req, res) => {
       });
     }
 
-    // 4. Sanitize filename
+    // 4. Read temporary file buffer for text extraction
+    const fileBuffer = await fs.promises.readFile(file.path);
+
+    // 5. Extract actual digital text stream from PDF
+    const { rawText } = await extractTextFromPdf(fileBuffer);
+
+    // 6. Parse structured medical test items from extracted text
+    const parsedData = parseMedicalReportText(rawText);
+
+    // 7. Sanitize filename
     const sanitizedName = sanitizeFilename(file.originalname);
 
-    // 5. Successful validation response
+    // 8. Build informative response message
+    let message = 'PDF uploaded and validated successfully';
+    if (parsedData.testCount > 0) {
+      message = `Report processed successfully: ${parsedData.testCount} medical test${
+        parsedData.testCount === 1 ? '' : 's'
+      } extracted`;
+    } else {
+      message =
+        'PDF uploaded and digital text extracted, but no recognizable clinical test results were found.';
+    }
+
     return res.status(200).json({
       success: true,
-      message: 'PDF uploaded and validated successfully',
+      message,
       file: {
         name: sanitizedName,
         size: file.size,
         mimeType: 'application/pdf',
       },
+      rawTextLength: parsedData.rawTextLength,
+      testCount: parsedData.testCount,
+      tests: parsedData.tests,
+      warnings: parsedData.warnings,
     });
   } catch (err) {
-    console.error('[HealthLens AI] Error validating uploaded PDF:', err.message);
+    if (err instanceof ScannedPdfError) {
+      return res.status(422).json({
+        success: false,
+        code: err.code,
+        message: err.message,
+      });
+    }
+
+    if (err instanceof PasswordProtectedPdfError) {
+      return res.status(400).json({
+        success: false,
+        code: err.code,
+        message: err.message,
+      });
+    }
+
+    if (err instanceof CorruptPdfError) {
+      return res.status(400).json({
+        success: false,
+        code: err.code,
+        message: err.message,
+      });
+    }
+
+    console.error('[HealthLens AI] Error processing uploaded PDF:', err.message);
     return res.status(500).json({
       success: false,
-      message: 'An internal error occurred while validating the uploaded file.',
+      message: 'An internal error occurred while processing the uploaded file.',
     });
   } finally {
-    // 6. Security & Privacy: Immediately clean up temporary uploaded file from disk
+    // 9. Ephemeral storage: immediately clean up temporary file from disk on success OR error
     if (file && file.path) {
       try {
         await fs.promises.unlink(file.path);
@@ -103,6 +156,18 @@ router.post('/upload', handleReportUpload, async (req, res) => {
       }
     }
   }
-});
+};
+
+/**
+ * POST /api/reports/upload
+ * Primary upload and extraction endpoint.
+ */
+router.post('/upload', handleReportUpload, processReportHandler);
+
+/**
+ * POST /api/reports/extract
+ * Dedicated semantic alias endpoint for report extraction.
+ */
+router.post('/extract', handleReportUpload, processReportHandler);
 
 export default router;
