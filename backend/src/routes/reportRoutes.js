@@ -10,6 +10,7 @@ import {
 } from '../services/pdfService.js';
 import { parseMedicalReportText } from '../services/parserService.js';
 import { evaluateMedicalTest, EVAL_STATUS } from '../services/evaluatorService.js';
+import { generateReportExplanation } from '../services/geminiService.js';
 
 const router = express.Router();
 
@@ -50,7 +51,8 @@ const sanitizeFilename = (filename) => {
 };
 
 /**
- * Core handler for PDF upload, text extraction, medical data parsing, and reference-range evaluation.
+ * Core handler for PDF upload, text extraction, medical data parsing,
+ * deterministic evaluation, and Gemini educational explanations.
  */
 const processReportHandler = async (req, res) => {
   const file = req.file;
@@ -103,10 +105,13 @@ const processReportHandler = async (req, res) => {
       discrepancyCount: evaluatedTests.filter((t) => t.flagDiscrepancy?.hasDiscrepancy).length,
     };
 
-    // 8. Sanitize filename
+    // 8. Generate educational AI explanations (with automatic safe fallback)
+    const aiExplanation = await generateReportExplanation(evaluatedTests);
+
+    // 9. Sanitize filename
     const sanitizedName = sanitizeFilename(file.originalname);
 
-    // 9. Build informative response message
+    // 10. Build informative response message
     let message = 'PDF uploaded and validated successfully';
     if (evaluatedTests.length > 0) {
       message = `Report processed successfully: ${evaluatedTests.length} medical test${
@@ -129,6 +134,7 @@ const processReportHandler = async (req, res) => {
       testCount: evaluatedTests.length,
       tests: evaluatedTests,
       evaluationSummary,
+      aiExplanation,
       warnings: parsedData.warnings,
     });
   } catch (err) {
@@ -162,7 +168,7 @@ const processReportHandler = async (req, res) => {
       message: 'An internal error occurred while processing the uploaded file.',
     });
   } finally {
-    // 10. Ephemeral storage: immediately clean up temporary file from disk on success OR error
+    // 11. Ephemeral storage: immediately clean up temporary file from disk on success OR error
     if (file && file.path) {
       try {
         await fs.promises.unlink(file.path);
@@ -175,7 +181,7 @@ const processReportHandler = async (req, res) => {
 
 /**
  * POST /api/reports/upload
- * Primary upload, extraction, and evaluation endpoint.
+ * Primary upload, extraction, deterministic evaluation, and Gemini explanation endpoint.
  */
 router.post('/upload', handleReportUpload, processReportHandler);
 
@@ -184,5 +190,33 @@ router.post('/upload', handleReportUpload, processReportHandler);
  * Dedicated semantic alias endpoint for report extraction and evaluation.
  */
 router.post('/extract', handleReportUpload, processReportHandler);
+
+/**
+ * POST /api/reports/explain
+ * Explains an array of evaluated tests using Gemini AI with fallback.
+ */
+router.post('/explain', async (req, res) => {
+  try {
+    const { tests } = req.body;
+    if (!tests || !Array.isArray(tests)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request: "tests" must be an array of evaluated medical test objects.',
+      });
+    }
+
+    const aiExplanation = await generateReportExplanation(tests);
+    return res.status(200).json({
+      success: true,
+      aiExplanation,
+    });
+  } catch (err) {
+    console.error('[HealthLens AI] Error generating explanation:', err.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to generate medical explanations.',
+    });
+  }
+});
 
 export default router;
