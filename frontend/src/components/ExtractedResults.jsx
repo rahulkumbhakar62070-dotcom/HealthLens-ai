@@ -54,6 +54,72 @@ export default function ExtractedResults({ data, onReset }) {
     }));
   };
 
+  const renderStatusBadge = (test) => {
+    if (test.status === 'NORMAL') {
+      return (
+        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          <span>Within Range</span>
+        </span>
+      );
+    }
+    if (test.status === 'LOW') {
+      return (
+        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200">
+          <ArrowDownRight className="w-3 h-3 text-sky-600" />
+          <span>Below Range</span>
+        </span>
+      );
+    }
+    if (test.status === 'HIGH') {
+      return (
+        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+          <ArrowUpRight className="w-3 h-3 text-rose-600" />
+          <span>Above Range</span>
+        </span>
+      );
+    }
+    return (
+      <div className="space-y-0.5">
+        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
+          <HelpCircle className="w-3 h-3 text-amber-600" />
+          <span>Not Evaluated</span>
+        </span>
+        {test.evaluationReason && (
+          <p className="text-[10px] text-charcoal-muted leading-tight">
+            {test.evaluationReason}
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  const renderPrintedFlagBadge = (test) => {
+    if (!test.printedFlag) {
+      return <span className="text-charcoal-muted text-xs">—</span>;
+    }
+    const isHigh =
+      test.printedFlag.toUpperCase().includes('H') ||
+      test.printedFlag.toUpperCase().includes('HIGH');
+    const isLow =
+      test.printedFlag.toUpperCase().includes('L') ||
+      test.printedFlag.toUpperCase().includes('LOW');
+
+    return (
+      <span
+        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
+          isHigh
+            ? 'bg-rose-50 text-rose-700 border border-rose-200'
+            : isLow
+            ? 'bg-sky-50 text-sky-700 border border-sky-200'
+            : 'bg-amber-50 text-amber-700 border border-amber-200'
+        }`}
+      >
+        {test.printedFlag}
+      </span>
+    );
+  };
+
   const formatFileSize = (bytes) => {
     if (!bytes) return '0 B';
     if (bytes < 1024) return `${bytes} B`;
@@ -308,8 +374,8 @@ export default function ExtractedResults({ data, onReset }) {
             </div>
           </div>
 
-          {/* Structured Results Table */}
-          <div className="overflow-x-auto border border-border rounded-xl bg-surface">
+          {/* Desktop Structured Results Table (Screens >= 640px) */}
+          <div className="hidden sm:block overflow-x-auto border border-border rounded-xl bg-surface">
             <table className="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="bg-background border-b border-border text-charcoal-muted uppercase text-[11px] tracking-wider font-semibold">
@@ -391,64 +457,15 @@ export default function ExtractedResults({ data, onReset }) {
                           )}
                         </td>
 
-                        {/* Calculated Status Badge (Phase 4) */}
+                        {/* Calculated Status Badge */}
                         <td className="py-3 px-4">
-                          {test.status === 'NORMAL' && (
-                            <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                              <span>Within Range</span>
-                            </span>
-                          )}
-
-                          {test.status === 'LOW' && (
-                            <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200">
-                              <ArrowDownRight className="w-3 h-3 text-sky-600" />
-                              <span>Below Range</span>
-                            </span>
-                          )}
-
-                          {test.status === 'HIGH' && (
-                            <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
-                              <ArrowUpRight className="w-3 h-3 text-rose-600" />
-                              <span>Above Range</span>
-                            </span>
-                          )}
-
-                          {test.status === 'NOT_EVALUATED' && (
-                            <div className="space-y-0.5">
-                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
-                                <HelpCircle className="w-3 h-3 text-amber-600" />
-                                <span>Not Evaluated</span>
-                              </span>
-                              {test.evaluationReason && (
-                                <p className="text-[10px] text-charcoal-muted leading-tight">
-                                  {test.evaluationReason}
-                                </p>
-                              )}
-                            </div>
-                          )}
+                          {renderStatusBadge(test)}
                         </td>
 
                         {/* Printed Report Flag & Discrepancy Alert */}
                         <td className="py-3 px-4">
                           <div className="space-y-1">
-                            {test.printedFlag ? (
-                              <span
-                                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
-                                  test.printedFlag.toUpperCase().includes('H') ||
-                                  test.printedFlag.toUpperCase().includes('HIGH')
-                                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                    : test.printedFlag.toUpperCase().includes('L') ||
-                                      test.printedFlag.toUpperCase().includes('LOW')
-                                    ? 'bg-sky-50 text-sky-700 border border-sky-200'
-                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
-                                }`}
-                              >
-                                {test.printedFlag}
-                              </span>
-                            ) : (
-                              <span className="text-charcoal-muted text-xs">—</span>
-                            )}
+                            {renderPrintedFlagBadge(test)}
 
                             {test.flagDiscrepancy?.hasDiscrepancy && (
                               <div
@@ -463,7 +480,7 @@ export default function ExtractedResults({ data, onReset }) {
                         </td>
                       </tr>
 
-                      {/* Expandable AI Explanation Row (Phase 5) */}
+                      {/* Expandable AI Explanation Row (Desktop) */}
                       {isExpanded && testExplanation && (
                         <tr className="bg-accent-soft/10">
                           <td colSpan="6" className="py-2.5 px-4 text-xs text-charcoal border-b border-border/60">
@@ -488,6 +505,127 @@ export default function ExtractedResults({ data, onReset }) {
                 })}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Stacked Results Cards (Screens < 640px) */}
+          <div className="block sm:hidden space-y-3">
+            {filteredTests.map((test, index) => {
+              const testExplanation =
+                aiExplanation?.testExplanations?.[test.testName] ||
+                aiExplanation?.testExplanations?.[test.testName.trim()];
+
+              const isExpanded =
+                expandedTests[test.testName] !== undefined
+                  ? expandedTests[test.testName]
+                  : showAllExplanations;
+
+              return (
+                <div
+                  key={`mobile-card-${index}`}
+                  className="bg-surface rounded-xl border border-border p-4 shadow-soft-sm space-y-3 transition-all"
+                >
+                  {/* Card Header: Test Name & Status */}
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="space-y-1 min-w-0">
+                      <h4 className="font-heading font-bold text-sm text-charcoal leading-snug">
+                        {test.testName}
+                      </h4>
+                      {test.boundaryInfo?.isBoundary && (
+                        <span className="inline-block text-[10px] font-medium text-charcoal-muted bg-background px-1.5 py-0.5 rounded border border-border">
+                          Boundary ({test.boundaryInfo.boundaryType || 'exact'})
+                        </span>
+                      )}
+                    </div>
+                    <div className="shrink-0">{renderStatusBadge(test)}</div>
+                  </div>
+
+                  {/* Measurements Grid */}
+                  <div className="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-background/60 border border-border/80 text-xs">
+                    <div>
+                      <p className="text-[10px] uppercase font-semibold text-charcoal-muted tracking-wide">
+                        Measured Value
+                      </p>
+                      <p className="font-mono font-bold text-charcoal mt-0.5 text-xs sm:text-sm">
+                        {String(test.value)}{' '}
+                        {test.unit ? (
+                          <span className="text-charcoal-muted text-[11px] font-normal">{test.unit}</span>
+                        ) : (
+                          <span className="text-amber-700 text-[10px] font-normal">(No unit)</span>
+                        )}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] uppercase font-semibold text-charcoal-muted tracking-wide">
+                        Reference Range
+                      </p>
+                      <p className="font-mono text-charcoal mt-0.5 text-xs">
+                        {test.referenceRange ? (
+                          <span>{test.referenceRange}</span>
+                        ) : (
+                          <span className="text-amber-700 text-[11px]">Not provided</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Printed Flag & Discrepancy Alert */}
+                  {(test.printedFlag || test.flagDiscrepancy?.hasDiscrepancy) && (
+                    <div className="space-y-1.5 pt-0.5">
+                      {test.printedFlag && (
+                        <div className="flex items-center space-x-2 text-xs">
+                          <span className="text-charcoal-muted text-[11px]">Printed Flag:</span>
+                          {renderPrintedFlagBadge(test)}
+                        </div>
+                      )}
+
+                      {test.flagDiscrepancy?.hasDiscrepancy && (
+                        <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start space-x-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
+                          <span className="leading-tight">
+                            {test.flagDiscrepancy.message ||
+                              'Report printed flag conflicts with calculated status.'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Expandable AI Explanation (Mobile) */}
+                  {testExplanation && (
+                    <div className="pt-2 border-t border-border/60">
+                      <button
+                        onClick={() => toggleTestExpand(test.testName)}
+                        className="w-full flex items-center justify-between text-xs text-primary font-medium hover:text-primary-hover cursor-pointer py-1"
+                      >
+                        <span className="flex items-center space-x-1.5">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>{isExpanded ? 'Hide Educational Context' : 'View Educational Context'}</span>
+                        </span>
+                        {isExpanded ? (
+                          <ChevronUp className="w-3.5 h-3.5" />
+                        ) : (
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+
+                      {isExpanded && (
+                        <div className="mt-2 p-2.5 rounded-lg bg-accent-soft/10 border-l-2 border-primary/50 text-xs space-y-1.5 text-charcoal animate-fadeIn">
+                          <p>
+                            <span className="font-semibold text-charcoal">What it measures:</span>{' '}
+                            <span className="text-charcoal-muted">{testExplanation.whatItMeasures}</span>
+                          </p>
+                          <p>
+                            <span className="font-semibold text-charcoal">Report context:</span>{' '}
+                            <span className="text-charcoal-muted">{testExplanation.findingSummary}</span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
