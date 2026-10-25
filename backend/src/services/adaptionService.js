@@ -44,6 +44,29 @@ const getAuthHeaders = () => {
 };
 
 /**
+ * List datasets in the account.
+ * Official Endpoint: GET /api/v1/datasets
+ */
+export const listDatasets = async () => {
+  const headers = getAuthHeaders();
+  const response = await fetch(`${ADAPTION_API_BASE}/datasets`, {
+    method: 'GET',
+    headers,
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new AdaptionApiError(
+      data?.message || `Failed to fetch datasets list (HTTP ${response.status})`,
+      response.status,
+      data
+    );
+  }
+
+  return data;
+};
+
+/**
  * Fetch available domain and subdomain codes from Adaption Labs.
  * Official Endpoint: GET /api/v1/datasets/invent_domains
  */
